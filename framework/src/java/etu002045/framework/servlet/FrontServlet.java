@@ -38,16 +38,6 @@ public class FrontServlet extends HttpServlet {
         out.println("Context Path :"+request.getContextPath());
         out.println("");
         out.println("URL :"+request.getRequestURL());
-        out.println("");
-        out.println("Parametre :");
-        Enumeration<String> liste = request.getParameterNames();
-        while(liste.hasMoreElements()){
-            String element = liste.nextElement();
-            String[] elementValues = request.getParameterValues(element);
-            for(int i=0 ; i<elementValues.length ; i++){
-                out.println(element+" "+(i+1)+" : "+elementValues[i]);
-            }
-        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
