@@ -5,13 +5,14 @@
  */
 package etu002045.framework.servlet;
 
+import etu002045.framework.Mapping;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 
 
 /**
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author ITU
  */
 public class FrontServlet extends HttpServlet {
+    HashMap<String, Mapping> urlsMapping;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -30,14 +32,7 @@ public class FrontServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
-        PrintWriter out = response.getWriter();
-        out.println("Servlet : Front Servlet");
-        out.println("");
-        out.println("Context Path :"+request.getContextPath());
-        out.println("");
-        out.println("URL :"+request.getRequestURL());
+            throws ServletException, IOException {        
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
