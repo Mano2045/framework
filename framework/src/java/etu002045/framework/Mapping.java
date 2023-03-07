@@ -28,5 +28,4 @@ public class Mapping {
         this.method = method;
     }
     
-    
 }
