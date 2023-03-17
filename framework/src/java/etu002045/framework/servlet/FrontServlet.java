@@ -6,8 +6,12 @@
 package etu002045.framework.servlet;
 
 import etu002045.framework.Mapping;
+import etu002045.framework.MethodAnnote;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,19 +22,36 @@ import javax.servlet.http.HttpServletResponse;
  * @author ITU
  */
 public class FrontServlet extends HttpServlet {
-    HashMap<String, Mapping> urlsMapping;
+    HashMap<String, Mapping> mappingUrl;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+      @Override  
+    public void init() {
+        mappingUrl = new HashMap<>();
+        try {
+            Vector<MethodAnnote> list = MethodAnnote.getAnnotedMethods("etu002045/framework/modele");
+            for ( MethodAnnote m : list) {
+                Mapping mp = new Mapping(m.getMethod().getDeclaringClass().getSimpleName(), m.getMethod().getName());
+                mappingUrl.put(m.getAnnotation().name(),mp);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+        
+    }
+    
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {        
+            throws ServletException, IOException {    
+            
+        PrintWriter out = response.getWriter();
+                
+        for (Map.Entry<String, Mapping> map : mappingUrl.entrySet()) {
+            String str = map.getKey();
+            Mapping val = map.getValue();
+            out.println("Url :" +str);
+            out.print("Methode name :" +val.getMethodName());            
+            out.println(" --> class :" +val.getClassName());
+        }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
