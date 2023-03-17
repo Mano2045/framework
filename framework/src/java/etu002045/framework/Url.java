@@ -7,4 +7,3 @@ import java.lang.annotation.*;
 public @interface Url {
     String name() default "";
 }
-

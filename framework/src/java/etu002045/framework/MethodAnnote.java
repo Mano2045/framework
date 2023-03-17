@@ -5,10 +5,7 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
-/**
- *
- * @author kodar
- */
+
 public class MethodAnnote {
     Method method;
     Url annotationMethode;

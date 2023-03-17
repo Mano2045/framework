@@ -31,6 +31,7 @@ public class FrontServlet extends HttpServlet {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
+        
     }
 
     /**
