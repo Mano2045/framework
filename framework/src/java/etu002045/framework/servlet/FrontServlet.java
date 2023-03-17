@@ -1,24 +1,41 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package etu002045.framework.servlet;
 
+import etu002045.framework.Mapping;
+import etu002045.framework.MethodAnnote;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
-
 /**
  *
- * @author ITU
+ * @author kodar
  */
 public class FrontServlet extends HttpServlet {
+    HashMap<String, Mapping> mappingUrl;
+
+    @Override  
+    public void init() {
+        mappingUrl = new HashMap<>();
+        try {
+            Vector<MethodAnnote> list = MethodAnnote.getAnnotedMethods("etu002045/framework/modele");
+            for ( MethodAnnote m : list) {
+                Mapping mp = new Mapping(m.getMethod().getDeclaringClass().getSimpleName(), m.getMethod().getName());
+                mappingUrl.put(m.getAnnotation().name(),mp);
+            }
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -31,13 +48,18 @@ public class FrontServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        PrintWriter out = response.getWriter();
-        out.println("Servlet : Front Servlet");
-        out.println("");
-        out.println("Context Path :"+request.getContextPath());
-        out.println("");
-        out.println("URL :"+request.getRequestURL());
+    
+            PrintWriter out = response.getWriter();
+            
+            
+        for (Map.Entry<String, Mapping> map : mappingUrl.entrySet()) {
+            String str = map.getKey();
+            Mapping val = map.getValue();
+            out.println("Url :" +str);
+            out.print("Methode name :" +val.getMethodName());            
+            out.println(" --> class :" +val.getClassName());
+        }
+
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -80,3 +102,4 @@ public class FrontServlet extends HttpServlet {
     }// </editor-fold>
 
 }
+
