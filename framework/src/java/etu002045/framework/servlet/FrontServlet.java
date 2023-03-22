@@ -73,9 +73,7 @@ public class FrontServlet extends HttpServlet {
         } catch (Exception e) {
             out.print(e.getMessage());
         }  
-        
-        
-        
+     
 //        for (Map.Entry<String, Mapping> map : mappingUrl.entrySet()) {
 //            String str = map.getKey();
 //            Mapping val = map.getValue();

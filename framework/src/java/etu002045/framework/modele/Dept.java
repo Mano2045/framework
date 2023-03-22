@@ -1,5 +1,6 @@
 package etu002045.framework.modele;
 
+import etu002045.framework.ModeleView;
 import etu002045.framework.Url;
 
 public class Dept {
@@ -24,12 +25,10 @@ public class Dept {
             deptno = id;
     }
     
-    @Url(name="dept-updat")
     public String getDname(){
             return dname;
     }
 
-    
     public void setDname(String n){
             dname = n;
     }
@@ -37,8 +36,14 @@ public class Dept {
             loc = l;
     }
     
-    @Url(name="dept-delete")
     public String getLoc(){
             return loc;
+    }
+    
+    @Url(name="dept-all")
+    public ModeleView findAll() {
+        ModeleView mv = new ModeleView();
+        mv.setView("listDept.jsp");
+        return mv;
     }
 }
