@@ -1,12 +1,18 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package etu002045.framework.servlet;
 
 import etu002045.framework.Mapping;
 import etu002045.framework.MethodAnnote;
+import etu002045.framework.ModeleView;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -14,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  *
- * @author kodar
+ * @author ITU
  */
 public class FrontServlet extends HttpServlet {
     HashMap<String, Mapping> mappingUrl;
@@ -23,16 +29,16 @@ public class FrontServlet extends HttpServlet {
     public void init() {
         mappingUrl = new HashMap<>();
         try {
-            Vector<MethodAnnote> list = MethodAnnote.getAnnotedMethods("etu002045/framework/modele");
+            Vector<MethodAnnote> list = MethodAnnote.getAnnotedMethods(this.getInitParameter("package-modele"));
             for ( MethodAnnote m : list) {
-                Mapping mp = new Mapping(m.getMethod().getDeclaringClass().getSimpleName(), m.getMethod().getName());
+                Mapping mp = new Mapping(m.getMethod().getDeclaringClass().getName(), m.getMethod().getName());
                 mappingUrl.put(m.getAnnotation().name(),mp);
             }
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
-        
     }
+    HashMap<String, Mapping> urlsMapping;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -46,17 +52,35 @@ public class FrontServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     
-            PrintWriter out = response.getWriter();
-            
-            
-        for (Map.Entry<String, Mapping> map : mappingUrl.entrySet()) {
-            String str = map.getKey();
-            Mapping val = map.getValue();
-            out.print( "[Url :" +str);
-            out.print("] [Methode name :" +val.getMethodName());            
-            out.println("] [class :" +val.getClassName()+"]");
-        }
-
+        PrintWriter out = response.getWriter();
+        
+        String url = request.getRequestURI();
+        url = url.split("/")[2];
+        
+        try {  
+            if (mappingUrl.containsKey(url)) {
+                Mapping mapping = mappingUrl.get(url);
+                Class cl = Class.forName(mapping.getClassName());
+                Object obj = cl.getMethod(mapping.getMethodName()).invoke(cl.getConstructor().newInstance());
+                if (obj.getClass() == ModeleView.class) {
+                    ModeleView mv = (ModeleView) obj;
+                    RequestDispatcher dispat = request.getRequestDispatcher(mv.getView()); 
+                    dispat.forward(request,response);
+                } else {
+                    throw new Exception("type de retour tsy mety");
+                }
+            }  
+        } catch (Exception e) {
+            out.print(e.getMessage());
+        }  
+     
+//        for (Map.Entry<String, Mapping> map : mappingUrl.entrySet()) {
+//            String str = map.getKey();
+//            Mapping val = map.getValue();
+//            out.print( "[Url :" +str);
+//            out.print("] [Methode name :" +val.getMethodName());            
+//            out.println("] [class :" +val.getClassName()+"]");
+//        }    
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
@@ -99,4 +123,3 @@ public class FrontServlet extends HttpServlet {
     }// </editor-fold>
 
 }
-
