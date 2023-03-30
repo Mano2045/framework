@@ -3,13 +3,15 @@
     <servlet>
         <servlet-name>FrontServlet</servlet-name>
         <servlet-class>etu002045.framework.servlet.FrontServlet</servlet-class>
+        <init-param>
+            <param-name> package-modele </param-name>
+            <param-value> etu002045/framework/modele </param-value>
+        </init-param>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>FrontServlet</servlet-name>
-        <url-pattern>/FrontServlet</url-pattern>
-        <url-pattern>/Ajouter</url-pattern>
-        <url-pattern>/Login</url-pattern>
+        <url-pattern>/</url-pattern>
     </servlet-mapping>
 
 </web-app>

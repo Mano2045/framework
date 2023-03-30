@@ -38,26 +38,25 @@ public class FrontServlet extends HttpServlet {
             System.out.println(ex.getMessage());
         }
     }
-    HashMap<String, Mapping> urlsMapping;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+//    /**
+//     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+//     * methods.
+//     *
+//     * @param request servlet request
+//     * @param response servlet response
+//     * @throws ServletException if a servlet-specific error occurs
+//     * @throws IOException if an I/O error occurs
+//     */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     
         PrintWriter out = response.getWriter();
-        
+          
         String url = request.getRequestURI();
-        url = url.split("/")[2];
-        
+       
         try {  
+            url = url.split("/")[2];
             if (mappingUrl.containsKey(url)) {
                 Mapping mapping = mappingUrl.get(url);
                 Class cl = Class.forName(mapping.getClassName());
@@ -66,14 +65,19 @@ public class FrontServlet extends HttpServlet {
                     ModeleView mv = (ModeleView) obj;
                     RequestDispatcher dispat = request.getRequestDispatcher(mv.getView()); 
                     dispat.forward(request,response);
+//                    out.print("huhu");
                 } else {
                     throw new Exception("type de retour tsy mety");
                 }
-            }  
+            } else {
+                throw new Exception("Not Found");
+            }
         } catch (Exception e) {
             out.print(e.getMessage());
-        }  
-     
+//            RequestDispatcher dispat = request.getRequestDispatcher("listDept.jsp"); 
+//            dispat.forward(request,response);
+        }
+  
 //        for (Map.Entry<String, Mapping> map : mappingUrl.entrySet()) {
 //            String str = map.getKey();
 //            Mapping val = map.getValue();
