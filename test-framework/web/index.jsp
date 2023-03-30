@@ -12,7 +12,6 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
     <body>
         <div>
             <a href="dept-all">list</a>
-<!--            <a href="Login">login</a>-->
         </div>
     </body>
 </html>
