@@ -1,7 +1,8 @@
-package etu002045.framework.modele;
+package modele;
 
 import etu002045.framework.ModeleView;
 import etu002045.framework.Url;
+import java.util.Vector;
 
 public class Dept {
     int deptno;
@@ -10,12 +11,12 @@ public class Dept {
 
     public Dept(){}
 
-    @SuppressWarnings("OverridableMethodCallInConstructor")
-    public Dept(int id,String n,String loc){
-        setDetpno(id);
-        setDname(n);
-        setLoc(loc);
+    public Dept(int deptno, String dname, String loc) {
+        this.deptno = deptno;
+        this.dname = dname;
+        this.loc = loc;
     }
+
 
     public int getDeptno(){
             return deptno;
@@ -41,9 +42,23 @@ public class Dept {
     }
     
     @Url(name="dept-all")
-    public ModeleView findAll() {
+    public ModeleView findAll() {      
+        Dept d1 = new Dept(1,"ITU1","TANA");        
+        Dept d2 = new Dept(2,"ITU2","TANA");        
+        Dept d3 = new Dept(2,"ITU3","TANA");        
+        Dept d4 = new Dept(2,"ITU","TANA");        
+
+        Vector<Dept> list = new Vector();
+        list.add(d1);
+        list.add(d2);
+        list.add(d3);
+        list.add(d4);
+        
         ModeleView mv = new ModeleView();
+        
         mv.setView("listDept.jsp");
+        mv.addItem("list", list);
+        
         return mv;
     }
 }

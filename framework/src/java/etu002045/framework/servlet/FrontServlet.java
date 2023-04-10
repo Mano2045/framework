@@ -11,6 +11,7 @@ import etu002045.framework.ModeleView;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -63,14 +64,18 @@ public class FrontServlet extends HttpServlet {
                 Object obj = cl.getMethod(mapping.getMethodName()).invoke(cl.getConstructor().newInstance());
                 if (obj.getClass() == ModeleView.class) {
                     ModeleView mv = (ModeleView) obj;
+                    
+                    for (Map.Entry<String, Object> data : mv.getData().entrySet()) {
+                        request.setAttribute(data.getKey(), data.getValue());
+                    }   
+                    
                     RequestDispatcher dispat = request.getRequestDispatcher(mv.getView()); 
                     dispat.forward(request,response);
-//                    out.print("huhu");
                 } else {
                     throw new Exception("type de retour tsy mety");
                 }
             } else {
-                throw new Exception("Not Found");
+                throw new Exception("Url Not Found");
             }
         } catch (Exception e) {
             out.print(e.getMessage());

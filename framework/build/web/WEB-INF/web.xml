@@ -5,7 +5,7 @@
         <servlet-class>etu002045.framework.servlet.FrontServlet</servlet-class>
         <init-param>
             <param-name> package-modele </param-name>
-            <param-value> modele </param-value>
+            <param-value> etu002045/framework/modele </param-value>
         </init-param>
     </servlet>
 
