@@ -22,7 +22,7 @@
         <h3>list Dept</h3>
         nb : <%= list.size() %> <br>
         <% for (Dept d : list) { %>
-            <%= d.getDname() %> <br>
+            <%= d.getDname() %> <%= d.getDate() %> <br>
         <% } %>
     </body>
 </html>

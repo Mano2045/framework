@@ -2,12 +2,14 @@ package modele;
 
 import etu002045.framework.ModeleView;
 import etu002045.framework.Url;
+import java.util.Date;
 import java.util.Vector;
 
 public class Dept {
     int deptno;
     String dname;
     String loc;
+    Date date;
 
     public Dept(){}
 
@@ -17,12 +19,11 @@ public class Dept {
         this.loc = loc;
     }
 
-
     public int getDeptno(){
             return deptno;
     }
     
-    public void setDetpno(int id){
+    public void setDeptno(int id){
             deptno = id;
     }
     
@@ -40,12 +41,20 @@ public class Dept {
     public String getLoc(){
             return loc;
     }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
     
     @Url(name="dept-all")
     public ModeleView findAll() {      
-        Dept d1 = new Dept(1,"ITU1","TANA");        
-        Dept d2 = new Dept(2,"ITU2","TANA");        
-        Dept d3 = new Dept(2,"ITU3","TANA");        
+        Dept d1 = new Dept(1,"ITU1","TANA1");        
+        Dept d2 = new Dept(2,"ITU2","TANA2");        
+        Dept d3 = new Dept(2,"ITU3","TANA3");        
         Dept d4 = new Dept(2,"ITU","TANA");        
 
         Vector<Dept> list = new Vector();
@@ -55,6 +64,20 @@ public class Dept {
         list.add(d4);
         
         ModeleView mv = new ModeleView();
+        
+        mv.setView("listDept.jsp");
+        mv.addItem("list", list);
+        
+        return mv;
+    }
+    
+    @Url(name="dept-save")
+    public ModeleView saveDept(){
+                
+        ModeleView mv = new ModeleView();
+        
+        Vector<Dept> list = new Vector();
+        list.add(this);
         
         mv.setView("listDept.jsp");
         mv.addItem("list", list);
