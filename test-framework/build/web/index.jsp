@@ -12,6 +12,9 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit thi
     <body>
         <div>
             <a href="dept-all">list</a>
+            <br/>
+            <a href="saveDept.jsp">ajouter</a>
+
         </div>
     </body>
 </html>
