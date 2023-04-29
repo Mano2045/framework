@@ -5,11 +5,17 @@
  */
 package etu002045.framework.servlet;
 
+import etu002045.framework.DateEditor;
 import etu002045.framework.Mapping;
 import etu002045.framework.MethodAnnote;
 import etu002045.framework.ModeleView;
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorManager;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
+import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -58,22 +64,46 @@ public class FrontServlet extends HttpServlet {
        
         try {  
             url = url.split("/")[2];
+
             if (mappingUrl.containsKey(url)) {
                 Mapping mapping = mappingUrl.get(url);
                 Class cl = Class.forName(mapping.getClassName());
-                Object obj = cl.getMethod(mapping.getMethodName()).invoke(cl.getConstructor().newInstance());
-                if (obj.getClass() == ModeleView.class) {
-                    ModeleView mv = (ModeleView) obj;
+                Object obj = cl.getConstructor().newInstance();
+                
+            //--Sprint7
+                Field[] attributs = cl.getDeclaredFields();
+                for (int i = 0; i < attributs.length; i++) {
+                    String param = request.getParameter(attributs[i].getName());
+                    if(param!=null){
+                        String setter = "set"+attributs[i].getName().substring(0, 1).toUpperCase()+ attributs[i].getName().substring(1);
+                        //out.println(setter+"("+request.getParameter(attributs[i].getName())+")");
+                        
+                        //cast 
+                        Class<?> clA = attributs[i].getType();
+                        PropertyEditor editor = PropertyEditorManager.findEditor(clA);
+                        PropertyEditorManager.registerEditor(Date.class, DateEditor.class);
+                        editor.setAsText(param);
+                        
+                        //set
+                        cl.getMethod(setter,clA).invoke(obj,editor.getValue());
+                    }
+                }    
+            //--end
+            
+                Object model = cl.getMethod(mapping.getMethodName()).invoke(obj);
+                if (model.getClass() == ModeleView.class) {
+                    ModeleView mv = (ModeleView) model;
                     
                     for (Map.Entry<String, Object> data : mv.getData().entrySet()) {
                         request.setAttribute(data.getKey(), data.getValue());
-                    }   
+                    }
                     
                     RequestDispatcher dispat = request.getRequestDispatcher(mv.getView()); 
                     dispat.forward(request,response);
                 } else {
-                    throw new Exception("type de retour tsy mety");
+                    throw new Exception("ataovy ModeleView");
                 }
+                
             } else {
                 throw new Exception("Url Not Found");
             }
@@ -119,6 +149,7 @@ public class FrontServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        
     }
 
     /**
