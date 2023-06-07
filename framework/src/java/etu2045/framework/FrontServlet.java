@@ -9,12 +9,18 @@ import etu2045.framework.AnnotationFonction;
 import etu2045.framework.Mapping;
 import etu2045.framework.ModelView;
 import etu2045.framework.Parametre;
+import etu2045.framework.UploadFile;
+import etu2045.framework.Scope;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -26,15 +32,20 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.Part;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.annotation.MultipartConfig;
+
 
 /**
  *
  * @author Best
  */
+@MultipartConfig()
 public class FrontServlet extends HttpServlet {
     Map<String, Mapping> MappingUrls = new HashMap<>();
+    Map<String, Object> singleton = new HashMap<>();
 
     @Override
     public void init() throws ServletException {
@@ -55,6 +66,11 @@ public class FrontServlet extends HttpServlet {
                         this.MappingUrls.put(url, mapping);
                     }
                 }
+                for (int i = 0; i < annoted_classes.size(); i++) {
+                    if (annoted_classes.get(i).isAnnotationPresent(Scope.class)) {
+                        singleton.put(annoted_classes.get(i).getName(),null);
+                    }
+                }
             }
         } catch (Exception e) {
             System.out.println("eto tompoko = " + e.getMessage());
@@ -69,6 +85,46 @@ public class FrontServlet extends HttpServlet {
         System.out.println(setter);
         return "set" + setter;
     }
+
+    private UploadFile fileTraitement(Collection<Part> files, Field field) {
+        UploadFile file = new UploadFile();
+        String name = field.getName();
+        boolean exists = false;
+        String filename = null;
+        Part filepart = null;
+        for (Part part : files) {
+            if (part.getName().equals(name)) {
+                filepart = part;
+                exists = true;
+                break;
+            }
+        }
+        try (InputStream io = filepart.getInputStream()) {
+            ByteArrayOutputStream buffers = new ByteArrayOutputStream();
+            byte[] buffer = new byte[(int) filepart.getSize()];
+            int read;
+            while ((read = io.read(buffer, 0, buffer.length)) != -1) {
+                buffers.write(buffer, 0, read);
+            }
+            file.setNom(this.getFileName(filepart));
+            file.setBytes(buffers.toByteArray());
+            return file;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    private String getFileName(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        String[] parts = contentDisposition.split(";");
+        for (String partStr : parts) {
+            if (partStr.trim().startsWith("filename"))
+                return partStr.substring(partStr.indexOf('=') + 1).trim().replace("\"", "");
+        }
+        return null;
+    }
+    
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -91,7 +147,6 @@ public class FrontServlet extends HttpServlet {
                 String className = this.MappingUrls.get(url).getClassName();
                 String method = this.MappingUrls.get(url).getMethod();
                 Class<?> c = Class.forName(className);
-                System.out.println(method);
                 Method m = null;
 
                 Method [] met = c.getDeclaredMethods();
@@ -99,12 +154,23 @@ public class FrontServlet extends HttpServlet {
                     if(met[i].getName().equals(method)){
                         m = met[i]; 
                         break;
-                    }
-                    
+                    } 
                 }                
 
                 Field[] field = c.getDeclaredFields();
-                Object o = c.getConstructor().newInstance();
+                Object o = null;
+                if (c.isAnnotationPresent(Scope.class)) {
+                    if (this.singleton.containsKey(c.getName()) && this.singleton.get(c.getName())!=null ) {
+                        o = this.singleton.get(c.getName());
+                    }
+                    else{
+                        o = c.getConstructor().newInstance();
+                        this.singleton.replace(c.getName(), null,o);
+                    }
+                }else{
+                    o = c.getConstructor().newInstance();                    
+                }
+                System.out.println(o);
                 Enumeration<String> enu = request.getParameterNames();
                 List<String> liste = Collections.list(enu);
                 for (int i = 0; i < field.length; i++) {
@@ -114,7 +180,6 @@ public class FrontServlet extends HttpServlet {
                         if (liste.get(j).trim().equals(fieldtab.trim())) {
                             if (field[i].getType().isArray() == false) {
                                 String str = request.getParameter(field[i].getName());
-                                System.out.println("name = " + field[i].getName());
                                 if (field[i].getType() == java.util.Date.class) {
                                     SimpleDateFormat s = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
                                     java.util.Date obj = s.parse(str);
@@ -138,7 +203,6 @@ public class FrontServlet extends HttpServlet {
                 for (int i = 0; i < para.length; i++) {
                     if (para[i].isAnnotationPresent(Parametre.class)) {
                             Parametre pa = para[i].getAnnotation(Parametre.class);
-                            System.out.println(para[i].getAnnotation(Parametre.class));
                             String p = para[i].getAnnotation(Parametre.class).parametre() + ((para[i].getType().isArray()) ? "[]" : "");
                             for (int j = 0; j < liste.size(); j++) {
                                 if (liste.get(j).trim().equals(p.trim())) {
@@ -163,7 +227,19 @@ public class FrontServlet extends HttpServlet {
                             }
                     }
                 }
-                
+                try {
+                        Collection<Part> files = request.getParts();
+                        for (Field f : field) {
+                            if (f.getType() == etu2045.framework.UploadFile.class) {
+                                Method meth = c.getMethod(this.getSetter(f.getName()) , f.getType());
+                                Object object = this.fileTraitement(files, f);
+                                meth.invoke(o, object);
+                            }
+                        }
+                    } catch (Exception e) {
+
+                    }
+
                 Object mv = m.invoke(o, parametres);
                 if (mv instanceof ModelView) {
                     ModelView model = (ModelView) mv;
