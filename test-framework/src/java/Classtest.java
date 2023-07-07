@@ -5,11 +5,13 @@
  */
 
  package test;
- 
+
 import etu2045.framework.ModelView;
 import etu2045.framework.Parametre;
+import etu2045.framework.Scope;
 import etu2045.framework.UploadFile;
 import etu2045.framework.AnnotationController;
+import etu2045.framework.Authentification;
 import etu2045.framework.Url;
 
 /**
@@ -76,7 +78,7 @@ public class Classtest {
         model.setView("Test.jsp");  
         return model;
     }
-
+    
     @Url(nom="parametre")
     public ModelView getParametre(@Parametre(parametre = "param") Integer i){
         ModelView model = new ModelView();
@@ -85,13 +87,30 @@ public class Classtest {
         return model;
     }
   
+    @Authentification()
     @Url(nom="getFile")
     public ModelView getFiles(){
         ModelView model = new ModelView();
-        System.out.println(this);
         model.setView("index.jsp");
         return model;
     }
 
+    @Authentification(profile = "admin")
+    @Url(nom="findAll")
+    public ModelView findAll(){ 
+        ModelView model = new ModelView();
+        model.setView("index.jsp");
+        return model;
+    }
 
+    @Url(nom="login")
+    public ModelView login(){
+        ModelView model = new ModelView();
+        model.addSession("isConnected", true);
+        model.addSession("profile", "admin");
+        model.setView("index.jsp");
+        return model;
+    }
+    
+    
 }
