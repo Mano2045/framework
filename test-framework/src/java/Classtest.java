@@ -5,7 +5,7 @@
  */
 
  package test;
-
+ 
 import etu2045.framework.ModelView;
 import etu2045.framework.Parametre;
 import etu2045.framework.UploadFile;
@@ -16,6 +16,7 @@ import etu2045.framework.Url;
  *
  * @author Best
  */
+@Scope()
 @AnnotationController
 public class Classtest {
     String nom;
@@ -87,9 +88,10 @@ public class Classtest {
     @Url(nom="getFile")
     public ModelView getFiles(){
         ModelView model = new ModelView();
-        System.out.println(this.getFile().getNom());
+        System.out.println(this);
         model.setView("index.jsp");
         return model;
     }
+
 
 }
